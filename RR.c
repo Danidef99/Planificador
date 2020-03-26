@@ -179,7 +179,8 @@ void mythread_exit() {
 void mythread_timeout(int tid) {
 
     printf("*** THREAD %d EJECTED\n", tid);
-    t_state[tid].state = FREE;
+    t_state[tid].state = FREE
+    ;
     free(t_state[tid].run_env.uc_stack.ss_sp);
 
     TCB* oldrunning = running;
@@ -254,13 +255,14 @@ void timer_interrupt(int sig)
 void activator(TCB* old)
 {
   if(old->state==FREE){
+    printf("*** THREAD  %d TERMINATED: SETCONTEXT  OF %d\n", old->tid, current);
     setcontext(&(running->run_env));
-    printf("*** THREAD READY : SET CONTEXT TO %d\n", current);
+    
   } 
 
   else if(old->tid != current){
-    swapcontext(&(old->run_env), &(running->run_env));
     printf("*** SWAPCONTEXT FROM %d TO %d\n", old->tid, current);
+    swapcontext(&(old->run_env), &(running->run_env));
   }
   
   //setcontext (&(next->run_env));
