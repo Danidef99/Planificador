@@ -217,7 +217,7 @@ void mythread_timeout(int tid) {
     TCB* oldRunning = running;
     running = scheduler();
     current = running->tid;
-    activator(oldRunning, running);    
+    activator(oldRunning);    
 }
 
 
@@ -294,7 +294,7 @@ void timer_interrupt(int sig)
 void activator(TCB* old)
 {
   if (old->state == FREE){
-    printf("*** THREAD READY : SET CONTEXT TO %d\n", current);
+    printf("***   THREAD  %d TERMINATED: SETCONTEXT  OF %d\n", old->tid, current);
     setcontext (&(running->run_env));
   }
   else if(old->priority==LOW_PRIORITY && running->priority==HIGH_PRIORITY){

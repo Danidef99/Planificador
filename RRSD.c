@@ -185,10 +185,7 @@ int mythread_create (void (*fun_addr)(),int priority,int seconds)
 /* Read disk syscall */
 int read_disk()
 {
-  int ret;
-  
-  ret = data_in_page_cache();
-  if(ret !=0){
+  if(data_in_page_cache() == 0){
     running->state = WAITING;
     printf("*** THREAD %d READ FROM DISK \n", current);
     disable_interrupt();
@@ -201,7 +198,6 @@ int read_disk()
         
   }
   return 1; 
-  
 }
 
 /* Disk interrupt  */
@@ -210,7 +206,7 @@ void disk_interrupt(int sig)
   if(!queue_empty(colaBlock)){
    TCB* elem = dequeue(colaBlock);
    elem->state = INIT;
-   printf("*** THREAD %d READY \n", current);
+   printf("*** THREAD %d READY \n", elem->tid);
    if(elem->priority == LOW_PRIORITY){
      disable_interrupt();
      enqueue(colaRR, elem);
@@ -251,7 +247,7 @@ void mythread_timeout(int tid) {
     TCB* oldRunning = running;
     running = scheduler();
     current = running->tid;
-    activator(oldRunning, running);    
+    activator(oldRunning);    
 }
 
 
@@ -308,11 +304,11 @@ TCB* scheduler()
 /* Timer interrupt */
 void timer_interrupt(int sig)
 {
-  if(current == -1){
+  if(current == -1){  //caso para running=idle
 
     running = scheduler();
     current = running->tid;
-    if(current!= -1){
+    if(current != -1){
       activator(&idle);
     }
     
